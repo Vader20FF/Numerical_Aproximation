@@ -1,10 +1,8 @@
-from sys import exit as exitProgram
+from sys import exit as exit_program
 from graph import generate_graph
 from function_value import get_function_value
-from horner import get_polynomial_value
 from gauss_integration import calculate_integral
 import numpy as np
-import sympy as sp
 
 
 def menu():
@@ -23,7 +21,7 @@ Wybór: """))
         if user_choice == 1:
             data_load()
         elif user_choice == 2:
-            exitProgram()
+            exit_program()
         else:
             print("""Wybrano nieprawidlowa opcje!""")
 
@@ -62,28 +60,46 @@ Podaj stopien wielomianu aproksymacji: """))
 Podaj stopien wielomianu aproksymacji: """))
 
     # Liczba wezlow dla metody calkowania Gaussa-Czebyszewa
-    nodes_number = float(input("""
-        Podaj liczbe wezlow dla metody calkowania (Gauss-Czebyszew): """))
+    nodes_number = int(input("""
+Podaj liczbe wezlow dla metody calkowania (Gauss-Czebyszew): """))
     while nodes_number < 0:
         print("Podaj liczbe wezlow wieksza od 0!")
-        nodes_number = float(input("""
-        Podaj liczbe wezlow dla metody calkowania (Gauss-Czebyszew): """))
+        nodes_number = int(input("""
+Podaj liczbe wezlow dla metody calkowania (Gauss-Czebyszew): """))
 
-    # NA 5: Oczekiwany błąd aproksymacji
-    aproximation_error = float(input("""
-        Podaj oczekiwany blad aproksymacji: """))
-    while aproximation_error < 0:
-        print("Podaj oczekiwany blad aproksymacji wiekszy od 0!")
-        aproximation_error = float(input("""
-        Podaj oczekiwany blad aproksymacji: """))
+    function_arguments = list(np.linspace(left_border, right_border, 1000))
 
-    calculations(function_number, nodes_number)
+    function_values = []
+    for x in function_arguments:
+        function_values.append(get_function_value(x, function_number))
 
+    generate_graph(function_arguments, function_values, function_number, True, None, None)
 
-def calculations(function_number, nodes_number):
+    calculated_values = calculations(function_number, left_border, right_border, polynomial_degree, nodes_number)
+
     print()
-    print("Wartosc dla metody Gaussa-Czebyszewa:", round(calculate_integral(function_number, nodes_number), 6))
-    print()
+    print("Blad aproksymacji wynosi:", calculated_values[0])
+
+    generate_graph(function_arguments, function_values, function_number, calculated_values[1], calculated_values[2])
+
+
+def calculations(function_number, left_border, right_border, polynomial_degree, nodes_number):
+    segment = 100
+    epsilon = 0.0
+    current_x = 0
+    current_y = 0
+    approximated_arguments = []
+    approximated_values = []
+
+    for i in range(segment):
+        current_x = left_border + 1.0 * i / segment * (right_border - left_border)
+        current_y = calculate_integral(current_x, function_number, nodes_number, polynomial_degree)
+        approximated_arguments.append(current_x)
+        approximated_values.append(current_y)
+        epsilon = epsilon + abs(get_function_value(current_x, function_number) - current_y)
+    epsilon /= 100
+
+    return [epsilon, approximated_arguments, approximated_values]
 
 
 ##########################################################################
