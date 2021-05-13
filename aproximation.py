@@ -1,4 +1,3 @@
-from gauss_integration import calculate_integral
 import numpy
 
 
@@ -12,8 +11,10 @@ def czebyszew_aproximation(polynomial_degree, argument, function_number):
 
 
 def calculate_aproximation(argument, function_number, polynomial_degree, nodes_number):
-    result = 1.0 / 2.0 * 2.0 / numpy.pi * calculate_integral(argument, function_number, nodes_number, polynomial_degree)
+    from gauss_integration import calculate_integral
+
+    result = 1.0 / 2.0 * 2.0 / numpy.pi * calculate_integral(function_number, nodes_number, 0)
     for i in range(1, polynomial_degree + 1):
-        result = result + 2.0 / numpy.pi * calculate_integral(argument, function_number, nodes_number,
-                                                              polynomial_degree)
+        result = result + 2.0 / numpy.pi * calculate_integral(function_number, nodes_number, i) * \
+                 czebyszew_aproximation(i, argument, function_number)
     return result

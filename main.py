@@ -1,7 +1,7 @@
 from sys import exit as exit_program
 from graph import generate_graph
 from function_value import get_function_value
-from gauss_integration import calculate_integral
+from aproximation import calculate_aproximation
 import numpy as np
 
 
@@ -42,7 +42,7 @@ Wybór: """))
         valid_number = False
         while not valid_number:
             function_number = int(input("""
-                Wybierz jeszcze raz numer funkcji: """))
+Wybierz jeszcze raz numer funkcji: """))
             if function_number in [1, 2, 3, 4, 5]:
                 valid_number = True
 
@@ -73,12 +73,13 @@ Podaj liczbe wezlow dla metody calkowania (Gauss-Czebyszew): """))
     for x in function_arguments:
         function_values.append(get_function_value(x, function_number))
 
-    generate_graph(function_arguments, function_values, function_number, True, None, None)
-
     calculated_values = calculations(function_number, left_border, right_border, polynomial_degree, nodes_number)
 
     print()
+    print("------------------------------------------------")
     print("Blad aproksymacji wynosi:", calculated_values[0])
+    print("------------------------------------------------")
+    print()
 
     generate_graph(function_arguments, function_values, function_number, calculated_values[1], calculated_values[2])
 
@@ -91,9 +92,9 @@ def calculations(function_number, left_border, right_border, polynomial_degree, 
     approximated_arguments = []
     approximated_values = []
 
-    for i in range(segment):
+    for i in range(0, segment):
         current_x = left_border + 1.0 * i / segment * (right_border - left_border)
-        current_y = calculate_integral(current_x, function_number, nodes_number, polynomial_degree)
+        current_y = calculate_aproximation(current_x, function_number, nodes_number, polynomial_degree)
         approximated_arguments.append(current_x)
         approximated_values.append(current_y)
         epsilon = epsilon + abs(get_function_value(current_x, function_number) - current_y)
